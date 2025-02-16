@@ -13,6 +13,8 @@ def print_board():
     print()
 
 def decide_next_move():
-    pass
+    player = "X"
+    computer = "O"
+    blank = "-"
 
 print_board()
