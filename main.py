@@ -4,12 +4,15 @@ board = [
     ["-", "-", "-"]
 ]
 
-def print_board(board):
+def print_board():
     print()
     for row in board:
         for column in row:
             print(f" {column}", end="")
         print()
     print()
-    
-print_board(board)
+
+def decide_next_move():
+    pass
+
+print_board()
