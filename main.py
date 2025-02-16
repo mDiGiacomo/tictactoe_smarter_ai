@@ -1,9 +1,9 @@
 import random
 
 board = [
-    ["-", "-", "-"],
-    ["-", "-", "-"],
-    ["-", "-", "-"]
+    ["O", "-", "X"],
+    ["-", "X", "-"],
+    ["X", "-", "O"]
 ]
 
 def print_board():
@@ -16,6 +16,21 @@ def print_board():
 
 def edit_board(coord, piece):
     board[coord[0]][coord[1]] = piece
+
+def check_for_win(board):
+    player = "X"
+    computer = "O"
+
+    for user in [player, computer]:
+        rows = [row for row in board if len(set(row)) == 1 and set(row) == {user}]
+        columns = [row for row in [list(x) for x in zip(*board)] if len(set(row)) == 1 and set(row) == {user}]
+        left_diagonal = len(set([item for sublist in board for item in sublist][::4])) and set([item for sublist in board for item in sublist][::4]) == {user}
+        right_diagonal = len(set([item for sublist in board for item in sublist][2::2][:3])) and set([item for sublist in board for item in sublist][2::2][:3]) == {user}
+        
+        #print(f"{rows}\n{columns}\n{left_diagonal}\n{right_diagonal}")
+
+        if rows or columns or left_diagonal or right_diagonal:
+            print(f'{user} won the gmae')
 
 def decide_next_move():
     player = "X"
@@ -40,8 +55,11 @@ def decide_next_move():
         else:
             new_move = [2 if coord == 0 else random.choice([0, 2]) if coord == 1 else 0 for coord in player_location]
             print(new_move)
-
+    elif total_moves == 2:
+        pass
     edit_board(new_move, computer)
 
-decide_next_move()
+check_for_win(board)
+
+#decide_next_move()
 print_board()
