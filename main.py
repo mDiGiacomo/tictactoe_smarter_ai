@@ -1,9 +1,9 @@
 import random
 
 board = [
-    ["-", "-", "-"],
-    ["-", "-", "-"],
-    ["-", "-", "-"]
+    ["X", "-", "-"],
+    ["-", "O", "-"],
+    ["-", "X", "-"]
 ]
 
 def print_board():
@@ -55,6 +55,7 @@ def decide_next_move():
     blank = "-"
     corners = [[0, 0], [0, 2], [2, 0], [2, 2]]
     edges = [[0, 1], [1, 0], [1, 2], [2, 1]]
+    center = [1, 1]
 
     total_moves = len([column for row in board for column in row if not column == blank])
     player_locations = [[row, column] for row in range(len(board)) for column in range(len(board[row])) if board[row][column] == player]
@@ -63,6 +64,7 @@ def decide_next_move():
     player_possible_win = check_possible_wins(player)
     computer_possible_win = check_possible_wins(computer)
 
+    # make a valid random move to have a default move ready
     while True:
         coord = [random.randint(0, 2), random.randint(0, 2)]
         if board[coord[0]][coord[1]] == '-':
@@ -74,16 +76,29 @@ def decide_next_move():
         edit_board(new_move, computer)
     elif total_moves == 1:
         player_location = player_locations[0]
-        if player_location == [1, 1]:
-            new_move = (random.choice([0, 2]), random.choice([0, 2]))
+        if player_location == center:
+            new_move = random.choice(corners)
         elif player_location in corners:
-            new_move = [1, 1]
+            new_move = center
         else:
             new_move = [2 if coord == 0 else random.choice([0, 2]) if coord == 1 else 0 for coord in player_location]
             print(new_move)
     elif total_moves == 2:
         pass
-    
+    elif total_moves == 3:
+        # if the player has both in the corner
+        if (player_locations[0] in corners) and (player_locations[1] in corners):
+            new_move = random.choice(edges)
+        # if the player has one in the center and one in the corner
+        elif ((player_locations[0] in corners) and (player_locations[1] == center)) or (player_locations[1] in corners) and (player_locations[0] == center):
+            new_move = random.choice(corners)
+        # if the player has one in the edge and center
+        elif ((player_locations[0] in edges) and (player_locations[1] in corners)) or ((player_locations[1] in edges) and (player_locations[0] in corners)):
+            if board[1][1] == blank:
+                new_move = center
+            else:
+                new_move = random.choice([corner for corner in corners if (corner != player_locations[0]) and (corner != player_locations[1])])
+
     # override any move that was made if a win is found for either player next round
     if computer_possible_win:
         new_move = computer_possible_win
@@ -92,28 +107,5 @@ def decide_next_move():
 
     edit_board(new_move, computer)
 
-for i in range(9):
-    if i % 2 == 0:
-        decide_next_move()
-        print_board()
-    else:
-        #while True:
-        #    coord = [random.randint(0, 2), random.randint(0, 2)]
-        #    if board[coord[0]][coord[1]] == '-':
-        #        board[coord[0]][coord[1]] = "X"
-        #        break
-        row = int(input("enter row: "))
-        column = int(input("enter column: "))
-        board[row][column] = "X"
-        #print_board()
-
-    winner = check_for_win()
-    if winner == "X":
-        print("player (random chance?) wins")
-        break
-    elif winner == "O":
-        print("COOL AI WINs")
-        break
-
-if not(check_for_win()):
-    print("Tie")
+decide_next_move()
+print_board()
