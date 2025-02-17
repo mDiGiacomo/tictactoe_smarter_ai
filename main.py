@@ -1,9 +1,9 @@
 import random
 
 board = [
-    ["O", "-", "X"],
-    ["-", "X", "-"],
-    ["X", "-", "O"]
+    ["-", "-", "-"],
+    ["-", "-", "-"],
+    ["-", "-", "-"]
 ]
 
 def print_board():
@@ -17,7 +17,7 @@ def print_board():
 def edit_board(coord, piece):
     board[coord[0]][coord[1]] = piece
 
-def check_for_win(board):
+def check_for_win(board=board):
     player = "X"
     computer = "O"
 
@@ -30,7 +30,24 @@ def check_for_win(board):
         #print(f"{rows}\n{columns}\n{left_diagonal}\n{right_diagonal}")
 
         if rows or columns or left_diagonal or right_diagonal:
-            print(f'{user} won the gmae')
+            return user
+
+    return False
+
+def check_possible_wins(user):
+    blank = '-'
+
+    for row_index, row in enumerate(board):
+        for column_index, column in enumerate(row):
+            if column != blank:
+                continue
+            
+            possible_board = [row[:] for row in board]
+            possible_board[row_index][column_index] = user
+            if check_for_win(possible_board) == user:
+                return [row_index, column_index]
+    
+    return False
 
 def decide_next_move():
     player = "X"
@@ -43,6 +60,15 @@ def decide_next_move():
     player_locations = [[row, column] for row in range(len(board)) for column in range(len(board[row])) if board[row][column] == player]
     computer_locations = [[row, column] for row in range(len(board)) for column in range(len(board[row])) if board[row][column] == computer]
     
+    player_possible_win = check_possible_wins(player)
+    computer_possible_win = check_possible_wins(computer)
+
+    while True:
+        coord = [random.randint(0, 2), random.randint(0, 2)]
+        if board[coord[0]][coord[1]] == '-':
+            new_move = coord
+            break
+
     if total_moves == 0:
         new_move = (random.choice([0, 2]), random.choice([0, 2]))
         edit_board(new_move, computer)
@@ -57,9 +83,37 @@ def decide_next_move():
             print(new_move)
     elif total_moves == 2:
         pass
+    
+    # override any move that was made if a win is found for either player next round
+    if computer_possible_win:
+        new_move = computer_possible_win
+    elif player_possible_win:
+        new_move = player_possible_win
+
     edit_board(new_move, computer)
 
-check_for_win(board)
+for i in range(9):
+    if i % 2 == 0:
+        decide_next_move()
+        print_board()
+    else:
+        #while True:
+        #    coord = [random.randint(0, 2), random.randint(0, 2)]
+        #    if board[coord[0]][coord[1]] == '-':
+        #        board[coord[0]][coord[1]] = "X"
+        #        break
+        row = int(input("enter row: "))
+        column = int(input("enter column: "))
+        board[row][column] = "X"
+        #print_board()
 
-#decide_next_move()
-print_board()
+    winner = check_for_win()
+    if winner == "X":
+        print("player (random chance?) wins")
+        break
+    elif winner == "O":
+        print("COOL AI WINs")
+        break
+
+if not(check_for_win()):
+    print("Tie")
