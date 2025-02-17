@@ -1,9 +1,12 @@
 import random
 
+player = "X"
+computer = "O"
+blank = "-"
 board = [
-    ["X", "-", "-"],
-    ["-", "O", "-"],
-    ["-", "X", "-"]
+    ["-", "-", "-"],
+    ["-", "-", "-"],
+    ["-", "-", "-"]
 ]
 
 def print_board():
@@ -18,9 +21,6 @@ def edit_board(coord, piece):
     board[coord[0]][coord[1]] = piece
 
 def check_for_win(board=board):
-    player = "X"
-    computer = "O"
-
     for user in [player, computer]:
         rows = [row for row in board if len(set(row)) == 1 and set(row) == {user}]
         columns = [row for row in [list(x) for x in zip(*board)] if len(set(row)) == 1 and set(row) == {user}]
@@ -35,8 +35,6 @@ def check_for_win(board=board):
     return False
 
 def check_possible_wins(user):
-    blank = '-'
-
     for row_index, row in enumerate(board):
         for column_index, column in enumerate(row):
             if column != blank:
@@ -50,9 +48,6 @@ def check_possible_wins(user):
     return False
 
 def decide_next_move():
-    player = "X"
-    computer = "O"
-    blank = "-"
     corners = [[0, 0], [0, 2], [2, 0], [2, 2]]
     edges = [[0, 1], [1, 0], [1, 2], [2, 1]]
     center = [1, 1]
@@ -84,7 +79,10 @@ def decide_next_move():
             new_move = [2 if coord == 0 else random.choice([0, 2]) if coord == 1 else 0 for coord in player_location]
             print(new_move)
     elif total_moves == 2:
-        pass
+        if (player_locations[0] in corners) or (player_locations[0] in edges):
+            new_move = center
+        else: # if the player moved to the center play the reciprocal of the current computer move
+            new_move = [2 if coord == 0 else random.choice([0, 2]) if coord == 1 else 0 for coord in computer_locations[0]]
     elif total_moves == 3:
         # if the player has both in the corner
         if (player_locations[0] in corners) and (player_locations[1] in corners):
